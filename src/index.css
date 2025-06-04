@@ -137,13 +137,13 @@ body {
 
 .profile-info {
   flex: 1;
-}
+  }
 
 .profile-name {
   margin: 0 0 0.25rem;
   font-size: 1.25rem;
   color: #2d3748;
-}
+  }
 
 .profile-email {
   margin: 0;

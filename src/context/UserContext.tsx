@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface UserData {
   fullName: string;
@@ -18,22 +18,63 @@ interface UserContextType {
   registeredUsers: UserData[];
   registerUser: (data: UserData) => void;
   login: (email: string, password: string) => boolean;
+  loading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'popx_user_data';
+const REGISTERED_USERS_KEY = 'popx_registered_users';
+
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [registeredUsers, setRegisteredUsers] = useState<UserData[]>([]);
 
+  // Load saved data on mount
+  useEffect(() => {
+    const savedUserData = localStorage.getItem(STORAGE_KEY);
+    const savedRegisteredUsers = localStorage.getItem(REGISTERED_USERS_KEY);
+    
+    if (savedUserData) {
+      setUserData(JSON.parse(savedUserData));
+    }
+    if (savedRegisteredUsers) {
+      setRegisteredUsers(JSON.parse(savedRegisteredUsers));
+    }
+    
+    setLoading(false);
+  }, []);
+
+  // Save data when it changes
+  useEffect(() => {
+    if (userData) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (registeredUsers.length > 0) {
+      localStorage.setItem(REGISTERED_USERS_KEY, JSON.stringify(registeredUsers));
+    }
+  }, [registeredUsers]);
+
   const registerUser = (data: UserData) => {
-    setRegisteredUsers([...registeredUsers, data]);
-    setUserData(data);
+    const newUser = {
+      ...data,
+      bio: data.bio || 'Lorem Ipsum Dolor Sit Amet, Consetetur Sadipscing Elitr, Sed Diam Nonumy Eirmod Tempor Invidunt Ut Labore Et Dolore Magna Aliquyam Erat, Sed Diam',
+      profileImage: data.profileImage || 'https://i.pravatar.cc/150?img=36',
+      isVerified: true
+    };
+    setRegisteredUsers([...registeredUsers, newUser]);
+    setUserData(newUser);
   };
 
   const login = (email: string, password: string): boolean => {
     const user = registeredUsers.find(
-      (u) => u.email === email && u.password === password
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
     );
     if (user) {
       setUserData(user);
@@ -50,6 +91,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         registeredUsers,
         registerUser,
         login,
+        loading
       }}
     >
       {children}
