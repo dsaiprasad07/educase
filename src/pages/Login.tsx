@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useUser();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -92,12 +94,15 @@ const Login = () => {
       return;
     }
 
-    // Here you would typically make an API call to verify credentials
-    // For now, we'll simulate a successful login
-    console.log('Logging in with:', formData);
+    // Try to login using context
+    const isSuccessful = login(formData.email, formData.password);
     
-    // Navigate to account settings page after successful login
-    navigate('/account');
+    if (isSuccessful) {
+      // Navigate to account settings page after successful login
+      navigate('/account');
+    } else {
+      alert('Invalid email or password');
+    }
   };
 
   return (

@@ -1,25 +1,16 @@
 import type { FC } from 'react';
 import { FaCamera } from "react-icons/fa";
+import { useUser } from '../context/UserContext';
+import { Navigate } from 'react-router-dom';
 
-interface AccountSettingsProps {
-  userData?: {
-    name: string;
-    email: string;
-    bio: string;
-    profileImage: string;
-    isVerified: boolean;
-  };
-}
+const AccountSettings: FC = () => {
+  const { userData } = useUser();
 
-const defaultUserData = {
-  name: 'Marry Doe',
-  email: 'Marry@Gmail.Com',
-  bio: 'Lorem Ipsum Dolor Sit Amet, Consetetur Sadipscing Elitr, Sed Diam Nonumy Eirmod Tempor Invidunt Ut Labore Et Dolore Magna Aliquyam Erat, Sed Diam',
-  profileImage: 'https://i.pravatar.cc/150?img=36',
-  isVerified: true
-};
+  // Redirect to login if not authenticated
+  if (!userData) {
+    return <Navigate to="/login" />;
+  }
 
-const AccountSettings: FC<AccountSettingsProps> = ({ userData = defaultUserData }) => {
   const containerStyle: React.CSSProperties = {
     maxWidth: '360px',
     width: '100%',
@@ -129,7 +120,7 @@ const AccountSettings: FC<AccountSettingsProps> = ({ userData = defaultUserData 
             <div style={imageContainerStyle}>
               <img
                 src={userData.profileImage}
-                alt={userData.name}
+                alt={userData.fullName}
                 style={profileImageStyle}
               />
               {userData.isVerified && (
@@ -140,7 +131,7 @@ const AccountSettings: FC<AccountSettingsProps> = ({ userData = defaultUserData 
             </div>
 
             <div style={profileInfoStyle}>
-              <h2 style={nameStyle}>{userData.name}</h2>
+              <h2 style={nameStyle}>{userData.fullName}</h2>
               <p style={emailStyle}>{userData.email}</p>
               <p style={bioStyle}>{userData.bio}</p>
             </div>

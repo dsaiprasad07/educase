@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { registerUser } = useUser();
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
     email: '',
     password: '',
     companyName: '',
-    isAgency: true
+    isAgency: true,
+    bio: 'Lorem Ipsum Dolor Sit Amet, Consetetur Sadipscing Elitr, Sed Diam Nonumy Eirmod Tempor Invidunt Ut Labore Et Dolore Magna Aliquyam Erat, Sed Diam',
+    profileImage: 'https://i.pravatar.cc/150?img=36',
+    isVerified: true
   });
 
   const [isHovered, setIsHovered] = useState(false);
@@ -41,8 +46,8 @@ const Register = () => {
       return;
     }
 
-    // Here you would typically make an API call to create the account
-    console.log('Account created with:', formData);
+    // Register user using context
+    registerUser(formData);
     
     // Navigate to account settings page
     navigate('/account');
@@ -145,7 +150,7 @@ const Register = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 style={inputStyle}
-                placeholder="Marry Doe"
+                placeholder="Enter Name"
               />
             </div>
 
